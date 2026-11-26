@@ -86,3 +86,55 @@ Pré-requisitos: Python 3.12 ou superior e Git.
    Acesse em http://127.0.0.1:8000. A documentação interativa da API fica em http://127.0.0.1:8000/docs.
 
 ## Execução dos testes
+
+Os comandos abaixo são executados na raiz do projeto, com o ambiente virtual ativado e as dependências de `requirements-dev.txt` instaladas (passos 2 e 3 acima).
+
+### Testes de unidade
+
+```bash
+pytest tests/unit
+```
+
+Eles testam as regras de negócio, os repositórios, a API e as páginas HTML. Cada teste usa um banco SQLite em memória, então o `cardapioru.db` local não é alterado.
+
+### Cobertura
+
+```bash
+pytest tests/unit --cov=app --cov-report=term-missing
+```
+
+O relatório mostra a porcentagem coberta de cada arquivo e, na coluna `Missing`, as linhas que nenhum teste executou. O CI falha se a cobertura total ficar abaixo de 80%. Para conferir isso localmente, acrescente `--cov-fail-under=80`.
+
+Para ver o relatório linha a linha no navegador, gere a versão HTML e abra `htmlcov/index.html`:
+
+```bash
+pytest tests/unit --cov=app --cov-report=html
+```
+
+### Testes end-to-end (e2e)
+
+Os testes e2e abrem o sistema num navegador de verdade, com o Playwright. Na primeira vez, instale o Chromium:
+
+```bash
+python -m playwright install chromium
+```
+
+Depois, rode:
+
+```bash
+pytest tests/e2e
+```
+
+Não é preciso iniciar a aplicação antes: os testes sobem o servidor sozinhos, numa porta livre e com um banco temporário, e o encerram no final.
+
+Para ver o navegador funcionando durante os testes, use `pytest tests/e2e --headed --slowmo 500`.
+
+O teste da página inicial é pulado aos sábados e domingos, porque o RU não serve refeições no fim de semana.
+
+### Todos os testes
+
+```bash
+pytest
+```
+
+Roda os testes de unidade e os e2e juntos. Por isso, também exige o Chromium instalado.
