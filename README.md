@@ -13,7 +13,39 @@ Conheça o cardápio interativo e a avaliação de pratos do restaurante univers
 
 ## Sobre o sistema
 
+O CardapioRU mostra o cardápio do restaurante universitário e permite que os estudantes avaliem os pratos. O RU serve almoço e jantar de segunda a sexta.
+
+Funcionalidades:
+
+- **Cardápio de hoje** (`/`): almoço e jantar do dia, com a categoria de cada prato e a indicação dos vegetarianos.
+- **Cardápio da semana** (`/semana`): uma tabela por dia útil, com filtro por categoria (prato principal, opção vegetariana, guarnição, salada e sobremesa) e opção de mostrar só os pratos vegetarianos.
+- **Página do prato** (`/pratos/{id}`): calorias, média das notas, lista de avaliações e formulário para avaliar.
+- **Avaliação de pratos**: nota de 1 a 5 e comentário opcional de até 280 caracteres. Um prato só pode ser avaliado no dia em que foi servido e até 3 dias depois.
+- **Ranking** (`/ranking`): pratos ordenados pela média das notas. Em caso de empate, fica na frente o prato com mais avaliações.
+- **API REST** (`/api/...`): os mesmos dados em JSON, com documentação interativa em `/docs`.
+
+Ao iniciar com o banco vazio, o sistema cria um cardápio de exemplo para a semana atual, com algumas avaliações.
+
+O código é organizado em camadas:
+
+- `app/domain`: regras de negócio, sem dependência de banco ou web, como a validação da nota, o prazo de avaliação, a média e o ranking.
+- `app/repositories`: acesso ao banco.
+- `app/services`: casos de uso que combinam as regras e o banco, como registrar uma avaliação.
+- `app/routers`: rotas da API e das páginas.
+- `app/templates`: páginas HTML.
+
 ## Tecnologias
+
+- **Python 3.12**
+- **FastAPI**: rotas da API e das páginas, com documentação automática da API.
+- **SQLModel** sobre **SQLite**: modelos e acesso ao banco.
+- **Jinja2** e **Pico.css**: páginas HTML renderizadas no servidor, sem JavaScript próprio.
+- **Uvicorn**: servidor da aplicação.
+- **pytest** e **pytest-cov**: testes de unidade e de integração, com cobertura mínima de 80% exigida no CI.
+- **Playwright**: testes end-to-end no navegador (Chromium).
+- **Ruff**: lint e formatação do código.
+- **GitHub Actions**: CI que roda lint, formatação, testes de unidade e testes e2e no Ubuntu, macOS e Windows.
+- **Render**: hospedagem da aplicação.
 
 ## Uso de IA
 
