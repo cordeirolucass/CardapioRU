@@ -13,7 +13,7 @@ class Categoria(StrEnum):
 @dataclass(frozen=True)
 class Prato:
     nome: str
-    categoria: Categoria
+    categoria: Categoria | str
     calorias: int
     vegetariano: bool = False
 
