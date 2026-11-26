@@ -8,7 +8,7 @@ from sqlmodel import Session
 from app.dependencies import HojeDep, SessionDep
 from app.domain.avaliacao import NOTA_MAXIMA, NOTA_MINIMA, TAMANHO_MAXIMO_COMENTARIO
 from app.domain.cardapio import cardapio_da_semana
-from app.domain.estatisticas import media_avaliacoes
+from app.domain.estatisticas import media_avaliacoes, ranking_pratos
 from app.models import PratoDB
 from app.repositories import avaliacoes as repo_avaliacoes
 from app.repositories import pratos as repo_pratos
@@ -34,6 +34,12 @@ def pagina_inicial(request: Request, session: SessionDep, hoje: HojeDep):
 def pagina_semana(request: Request, session: SessionDep, hoje: HojeDep):
     semana = cardapio_da_semana(repo_refeicoes.listar_da_semana(session, hoje), hoje)
     return templates.TemplateResponse(request, "semana.html", {"hoje": hoje, "semana": semana})
+
+
+@router.get("/ranking", response_class=HTMLResponse)
+def pagina_ranking(request: Request, session: SessionDep):
+    itens = ranking_pratos((prato, prato.avaliacoes) for prato in repo_pratos.listar(session))
+    return templates.TemplateResponse(request, "ranking.html", {"itens": itens})
 
 
 def _pagina_nao_encontrada(request: Request):

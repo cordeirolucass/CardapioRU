@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block titulo %}Ranking dos pratos{% endblock %}
+
+{% block conteudo %}
+<hgroup>
+  <h1>Ranking dos pratos</h1>
+  <p>Ordenado pela média das notas. Em caso de empate, ganha quem tem mais avaliações.</p>
+</hgroup>
+
+{% if itens %}
+  <div class="overflow-auto">
+    <table class="striped" data-testid="tabela-ranking">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Prato</th>
+          <th scope="col">Categoria</th>
+          <th scope="col">Média</th>
+          <th scope="col">Avaliações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in itens %}
+          <tr data-testid="item-ranking">
+            <th scope="row" data-testid="posicao">{{ loop.index }}º</th>
+            <td>
+              <a href="/pratos/{{ item.prato.id }}" data-testid="ranking-prato">{{ item.prato.nome }}</a>
+              {% if item.prato.e_vegetariano %}<small> · 🌱</small>{% endif %}
+            </td>
+            <td>{{ item.prato.categoria | categoria }}</td>
+            <td data-testid="ranking-media">{{ "%.1f" | format(item.media) | replace(".", ",") }}</td>
+            <td data-testid="ranking-total">{{ item.total_avaliacoes }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <article data-testid="ranking-vazio">
+    <p>Nenhum prato foi avaliado ainda. Veja o <a href="/">cardápio de hoje</a> e avalie o que comeu.</p>
+  </article>
+{% endif %}
+{% endblock %}
