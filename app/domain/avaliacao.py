@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+from datetime import date, timedelta
 
 NOTA_MINIMA = 1
 NOTA_MAXIMA = 5
 TAMANHO_MAXIMO_COMENTARIO = 280
+PRAZO_AVALIACAO_DIAS = 3
 
 
 @dataclass(frozen=True)
@@ -24,3 +26,9 @@ class Avaliacao:
             )
 
         object.__setattr__(self, "comentario", comentario)
+
+
+def pode_avaliar(data_refeicao: date, hoje: date) -> bool:
+    """Uma refeição pode ser avaliada a partir do dia em que foi servida e até 3 dias depois."""
+    prazo_final = data_refeicao + timedelta(days=PRAZO_AVALIACAO_DIAS)
+    return data_refeicao <= hoje <= prazo_final
