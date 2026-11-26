@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ prato.nome }}{% endblock %}
+
+{% block conteudo %}
+<hgroup>
+  <h1 data-testid="prato-nome">{{ prato.nome }}</h1>
+  <p>
+    {{ prato.categoria | categoria }} · {{ prato.calorias }} kcal
+    {% if prato.e_vegetariano %} · 🌱 vegetariano{% endif %}
+  </p>
+</hgroup>
+
+<article>
+  <header><h2>Avaliação dos estudantes</h2></header>
+  {% if media is not none %}
+    <p>
+      <strong data-testid="media">{{ "%.1f" | format(media) | replace(".", ",") }}</strong> de 5
+      · <span data-testid="total-avaliacoes">{{ avaliacoes | length }}</span>
+      {{ "avaliação" if avaliacoes | length == 1 else "avaliações" }}
+    </p>
+  {% else %}
+    <p data-testid="sem-media">Este prato ainda não tem média, porque ninguém avaliou.</p>
+  {% endif %}
+</article>
+
+<section>
+  <h2>Avaliar este prato</h2>
+
+  {% if avaliado %}
+    <p data-testid="avaliacao-enviada"><mark>Obrigado! Sua avaliação foi registrada.</mark></p>
+  {% endif %}
+
+  {% if erro %}
+    <p data-testid="erro-avaliacao" role="alert"><mark>{{ erro }}</mark></p>
+  {% endif %}
+
+  {% if pode_avaliar %}
+    <form method="post" action="/pratos/{{ prato.id }}/avaliacoes" data-testid="form-avaliacao">
+      <fieldset>
+        <legend>Nota</legend>
+        {% for n in notas %}
+          <label>
+            <input type="radio" name="nota" value="{{ n }}" required
+                   {% if nota == n | string %}checked{% endif %}>
+            {{ n }} {{ "★" * n }}
+          </label>
+        {% endfor %}
+      </fieldset>
+
+      <label>
+        Comentário (opcional)
+        <textarea name="comentario" maxlength="{{ tamanho_maximo_comentario }}" rows="3"
+                  placeholder="O que achou?">{{ comentario or "" }}</textarea>
+        <small>Até {{ tamanho_maximo_comentario }} caracteres.</small>
+      </label>
+
+      <button type="submit">Enviar avaliação</button>
+    </form>
+  {% else %}
+    <p data-testid="prazo-encerrado">
+      Só dá para avaliar um prato até 3 dias depois de ele ser servido, e este não foi
+      servido nesse período.
+    </p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>Avaliações</h2>
+  {% if avaliacoes %}
+    {% for avaliacao in avaliacoes %}
+      <article data-testid="avaliacao">
+        <header>
+          <strong>{{ "★" * avaliacao.nota }}{{ "☆" * (5 - avaliacao.nota) }}</strong>
+          <span data-testid="avaliacao-nota">{{ avaliacao.nota }}</span>/5
+          · <small>{{ avaliacao.criada_em | data_br }}</small>
+        </header>
+        {% if avaliacao.comentario %}
+          <p>{{ avaliacao.comentario }}</p>
+        {% else %}
+          <p><small><em>Sem comentário.</em></small></p>
+        {% endif %}
+      </article>
+    {% endfor %}
+  {% else %}
+    <p data-testid="sem-avaliacoes">Nenhuma avaliação ainda. Seja o primeiro!</p>
+  {% endif %}
+</section>
+{% endblock %}
