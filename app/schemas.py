@@ -51,3 +51,10 @@ class AvaliacaoPublica(BaseModel):
     nota: int
     comentario: str | None
     criada_em: date
+
+
+class ItemRankingPublico(BaseModel):
+    posicao: int
+    prato: PratoPublico
+    media: float
+    total_avaliacoes: int
