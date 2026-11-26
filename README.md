@@ -1,6 +1,10 @@
 # CardapioRU
 Conheça o cardápio interativo e a avaliação de pratos do restaurante universitário mais gostoso da cidade.
 
+**Acesse o app:** https://cardapioru-xu5v.onrender.com
+
+> Hospedado no plano gratuito do Render: a primeira visita depois de um tempo parado pode levar até um minuto, enquanto o serviço acorda. As avaliações são apagadas a cada novo deploy, porque o banco SQLite não fica salvo nesse plano.
+
 ## Integrantes
 
 - Lucas Oliveira Frade Ribeiro Cordeiro
