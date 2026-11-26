@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block titulo %}Cardápio da semana{% endblock %}
+
+{% block conteudo %}
+<hgroup>
+  <h1>Cardápio da semana</h1>
+  {% set dias = semana | list %}
+  <p>De {{ dias[0] | data_br }} a {{ dias[-1] | data_br }}</p>
+</hgroup>
+
+{% for dia, refeicoes in semana.items() %}
+  <section data-testid="dia-{{ dia.isoformat() }}">
+    <h2>
+      {{ dia | dia_da_semana }}, {{ dia | data_br }}
+      {% if dia == hoje %}<mark data-testid="dia-hoje">hoje</mark>{% endif %}
+    </h2>
+
+    {% if refeicoes %}
+      <div class="overflow-auto">
+        <table class="striped">
+          <thead>
+            <tr>
+              <th scope="col">Refeição</th>
+              <th scope="col">Prato</th>
+              <th scope="col">Categoria</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for refeicao in refeicoes %}
+              {% for prato in refeicao.pratos %}
+                <tr data-testid="prato" data-refeicao="{{ refeicao.tipo.value }}">
+                  {% if loop.first %}
+                    <th scope="row" rowspan="{{ refeicao.pratos | length }}"
+                        data-testid="refeicao-{{ refeicao.tipo.value }}">{{ refeicao.tipo | tipo_refeicao }}</th>
+                  {% endif %}
+                  <td><a href="/pratos/{{ prato.id }}">{{ prato.nome }}</a></td>
+                  <td>{{ prato.categoria | categoria }}{% if prato.e_vegetariano %} · 🌱 vegetariano{% endif %}</td>
+                </tr>
+              {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p data-testid="sem-cardapio">Sem cardápio para este dia.</p>
+    {% endif %}
+  </section>
+{% endfor %}
+{% endblock %}
