@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from sqlmodel import Session, select
 
 from app.domain.cardapio import inicio_da_semana
-from app.models import PratoDB, RefeicaoDB, TipoRefeicao
+from app.models import PratoDB, RefeicaoDB, RefeicaoPratoLink, TipoRefeicao
 
 
 def criar(
@@ -31,3 +31,14 @@ def listar_da_semana(session: Session, data_ref: date) -> list[RefeicaoDB]:
         .order_by(RefeicaoDB.data, RefeicaoDB.tipo)
     )
     return list(session.exec(consulta))
+
+
+def ultima_data_servida(session: Session, prato_id: int, ate: date) -> date | None:
+    """Data mais recente, até a data informada, de uma refeição que serviu o prato."""
+    consulta = (
+        select(RefeicaoDB.data)
+        .join(RefeicaoPratoLink)
+        .where(RefeicaoPratoLink.prato_id == prato_id, RefeicaoDB.data <= ate)
+        .order_by(RefeicaoDB.data.desc())
+    )
+    return session.exec(consulta).first()

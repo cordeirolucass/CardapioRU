@@ -39,3 +39,15 @@ class CardapioDoDia(BaseModel):
 
 class CardapioDaSemana(BaseModel):
     dias: list[CardapioDoDia]
+
+
+class AvaliacaoEntrada(BaseModel):
+    nota: int
+    comentario: str | None = None
+
+
+class AvaliacaoPublica(BaseModel):
+    id: int
+    nota: int
+    comentario: str | None
+    criada_em: date
