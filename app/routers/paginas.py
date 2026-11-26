@@ -9,6 +9,8 @@ from app.dependencies import HojeDep, SessionDep
 from app.domain.avaliacao import NOTA_MAXIMA, NOTA_MINIMA, TAMANHO_MAXIMO_COMENTARIO
 from app.domain.cardapio import cardapio_da_semana
 from app.domain.estatisticas import media_avaliacoes, ranking_pratos
+from app.domain.filtros import filtrar_pratos
+from app.domain.prato import Categoria
 from app.models import PratoDB
 from app.repositories import avaliacoes as repo_avaliacoes
 from app.repositories import pratos as repo_pratos
@@ -31,9 +33,40 @@ def pagina_inicial(request: Request, session: SessionDep, hoje: HojeDep):
 
 
 @router.get("/semana", response_class=HTMLResponse)
-def pagina_semana(request: Request, session: SessionDep, hoje: HojeDep):
+def pagina_semana(
+    request: Request,
+    session: SessionDep,
+    hoje: HojeDep,
+    categoria: str | None = None,
+    vegetariano: bool = False,
+):
+    # Categoria desconhecida na URL é ignorada, como se o filtro estivesse em "Todas".
+    categoria_filtro = categoria if categoria in set(Categoria) else None
+    filtrando = categoria_filtro is not None or vegetariano
+
     semana = cardapio_da_semana(repo_refeicoes.listar_da_semana(session, hoje), hoje)
-    return templates.TemplateResponse(request, "semana.html", {"hoje": hoje, "semana": semana})
+    # Cada dia vira (tem_cardapio, [(refeicao, pratos_filtrados)]). Os pratos são filtrados
+    # numa lista à parte para não mexer no relacionamento refeicao.pratos do banco.
+    dias = {}
+    for dia, refeicoes in semana.items():
+        refeicoes_filtradas = []
+        for refeicao in refeicoes:
+            pratos = filtrar_pratos(
+                refeicao.pratos, categoria=categoria_filtro, apenas_vegetarianos=vegetariano
+            )
+            if pratos:
+                refeicoes_filtradas.append((refeicao, pratos))
+        dias[dia] = (bool(refeicoes), refeicoes_filtradas)
+
+    contexto = {
+        "hoje": hoje,
+        "dias": dias,
+        "categorias": list(Categoria),
+        "categoria": categoria_filtro,
+        "vegetariano": vegetariano,
+        "filtrando": filtrando,
+    }
+    return templates.TemplateResponse(request, "semana.html", contexto)
 
 
 @router.get("/ranking", response_class=HTMLResponse)

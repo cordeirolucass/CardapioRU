@@ -1,3 +1,4 @@
+import re
 from datetime import date
 
 import pytest
@@ -74,3 +75,58 @@ def test_no_fim_de_semana_mostra_a_semana_corrente_sem_destaque(client, definir_
 
     assert 'data-testid="dia-2026-11-23"' in html
     assert 'data-testid="dia-hoje"' not in html
+
+
+def pratos_da_pagina(html):
+    return re.findall(r'data-testid="prato".*?<a href="/pratos/\d+">([^<]*)</a>', html, re.S)
+
+
+def test_formulario_de_filtro_aparece_na_pagina(client, definir_hoje):
+    definir_hoje(QUINTA)
+
+    html = client.get("/semana").text
+
+    assert 'data-testid="form-filtro"' in html
+    assert 'data-testid="filtro-vegetariano"' in html
+    assert html.count("<option") == 6  # "Todas" + 5 categorias
+    assert "Guarnição" in html
+    assert 'data-testid="limpar-filtro"' not in html
+
+
+def test_filtra_por_categoria(client, definir_hoje):
+    definir_hoje(QUINTA)
+
+    html = client.get("/semana", params={"categoria": "sobremesa"}).text
+
+    assert pratos_da_pagina(html) == ["Pudim", "Pudim"]
+    assert '<option value="sobremesa" selected>' in html
+    assert 'data-testid="limpar-filtro"' in html
+
+
+def test_filtra_so_vegetarianos(client, definir_hoje):
+    definir_hoje(QUINTA)
+
+    html = client.get("/semana", params={"vegetariano": "true"}).text
+
+    assert pratos_da_pagina(html) == ["Quibe de abóbora"]
+    assert 'data-testid="refeicao-almoco"' not in html
+    assert "checked" in html
+
+
+def test_dia_com_cardapio_sem_prato_no_filtro_mostra_aviso_proprio(client, definir_hoje):
+    definir_hoje(QUINTA)
+
+    html = client.get("/semana", params={"vegetariano": "true"}).text
+
+    secao_segunda = html.split('data-testid="dia-2026-11-23"')[1].split("</section>")[0]
+    assert 'data-testid="sem-resultado"' in secao_segunda
+    assert html.count('data-testid="sem-cardapio"') == 3
+
+
+def test_categoria_desconhecida_e_ignorada(client, definir_hoje):
+    definir_hoje(QUINTA)
+
+    resposta = client.get("/semana", params={"categoria": "pizza"})
+
+    assert resposta.status_code == 200
+    assert len(pratos_da_pagina(resposta.text)) == 4

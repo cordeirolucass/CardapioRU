@@ -5,11 +5,36 @@
 {% block conteudo %}
 <hgroup>
   <h1>Cardápio da semana</h1>
-  {% set dias = semana | list %}
-  <p>De {{ dias[0] | data_br }} a {{ dias[-1] | data_br }}</p>
+  {% set datas = dias | list %}
+  <p>De {{ datas[0] | data_br }} a {{ datas[-1] | data_br }}</p>
 </hgroup>
 
-{% for dia, refeicoes in semana.items() %}
+<form method="get" action="/semana" data-testid="form-filtro">
+  <fieldset class="grid">
+    <label>
+      Categoria
+      <select name="categoria" data-testid="filtro-categoria">
+        <option value="" {% if not categoria %}selected{% endif %}>Todas</option>
+        {% for opcao in categorias %}
+          <option value="{{ opcao.value }}" {% if categoria == opcao %}selected{% endif %}>
+            {{ opcao.value | categoria }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <input type="checkbox" name="vegetariano" value="true" data-testid="filtro-vegetariano"
+             {% if vegetariano %}checked{% endif %}>
+      Só vegetarianos
+    </label>
+  </fieldset>
+  <button type="submit" data-testid="filtrar">Filtrar</button>
+  {% if filtrando %}
+    <a href="/semana" role="button" class="secondary" data-testid="limpar-filtro">Limpar filtros</a>
+  {% endif %}
+</form>
+
+{% for dia, (tem_cardapio, refeicoes) in dias.items() %}
   <section data-testid="dia-{{ dia.isoformat() }}">
     <h2>
       {{ dia | dia_da_semana }}, {{ dia | data_br }}
@@ -27,11 +52,11 @@
             </tr>
           </thead>
           <tbody>
-            {% for refeicao in refeicoes %}
-              {% for prato in refeicao.pratos %}
+            {% for refeicao, pratos in refeicoes %}
+              {% for prato in pratos %}
                 <tr data-testid="prato" data-refeicao="{{ refeicao.tipo.value }}">
                   {% if loop.first %}
-                    <th scope="row" rowspan="{{ refeicao.pratos | length }}"
+                    <th scope="row" rowspan="{{ pratos | length }}"
                         data-testid="refeicao-{{ refeicao.tipo.value }}">{{ refeicao.tipo | tipo_refeicao }}</th>
                   {% endif %}
                   <td><a href="/pratos/{{ prato.id }}">{{ prato.nome }}</a></td>
@@ -42,6 +67,8 @@
           </tbody>
         </table>
       </div>
+    {% elif tem_cardapio %}
+      <p data-testid="sem-resultado">Nenhum prato deste dia combina com o filtro.</p>
     {% else %}
       <p data-testid="sem-cardapio">Sem cardápio para este dia.</p>
     {% endif %}
