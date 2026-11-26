@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}CardápioRU{% endblock %} · CardápioRU</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  </head>
+  <body>
+    <header class="container">
+      <nav>
+        <ul>
+          <li><a href="/" class="contrast"><strong>CardápioRU</strong></a></li>
+        </ul>
+        <ul>
+          <li><a href="/" data-testid="nav-hoje">Hoje</a></li>
+          <li><a href="/semana" data-testid="nav-semana">Semana</a></li>
+          <li><a href="/ranking" data-testid="nav-ranking">Ranking</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="container">
+      {% block conteudo %}{% endblock %}
+    </main>
+
+    <footer class="container">
+      <small>Cardápio e avaliações do restaurante universitário.</small>
+    </footer>
+  </body>
+</html>
