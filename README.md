@@ -1,4 +1,7 @@
 # CardapioRU
+
+[![CI](https://github.com/cordeirolucass/CardapioRU/actions/workflows/ci.yml/badge.svg)](https://github.com/cordeirolucass/CardapioRU/actions/workflows/ci.yml)
+
 Conheça o cardápio interativo e a avaliação de pratos do restaurante universitário mais gostoso da cidade.
 
 **Acesse o app:** https://cardapioru-xu5v.onrender.com
