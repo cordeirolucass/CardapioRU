@@ -17,7 +17,6 @@ from app.repositories import pratos as repo_pratos
 from app.repositories import refeicoes as repo_refeicoes
 from app.services.avaliacoes import (
     ForaDoPrazo,
-    PratoNaoEncontrado,
     esta_no_prazo,
     registrar_avaliacao,
 )
@@ -136,8 +135,6 @@ def enviar_avaliacao(
         if not (nota and nota.strip().isdigit()):
             raise ValueError(f"Escolha uma nota de {NOTA_MINIMA} a {NOTA_MAXIMA}.")
         registrar_avaliacao(session, prato_id, int(nota), comentario, hoje)
-    except PratoNaoEncontrado:
-        return _pagina_nao_encontrada(request)
     except (ValueError, ForaDoPrazo) as erro:
         codigo = (
             status.HTTP_400_BAD_REQUEST
