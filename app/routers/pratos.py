@@ -6,6 +6,7 @@ from app.dependencies import HojeDep, SessionDep
 from app.domain.filtros import filtrar_pratos
 from app.domain.prato import Categoria
 from app.repositories import pratos as repo_pratos
+from app.routers.erros import status_do_erro_de_avaliacao
 from app.schemas import AvaliacaoEntrada, AvaliacaoPublica, PratoPublico
 from app.services.avaliacoes import ForaDoPrazo, PratoNaoEncontrado, registrar_avaliacao
 
@@ -30,11 +31,9 @@ def avaliar_prato(
 ) -> AvaliacaoPublica:
     try:
         criada = registrar_avaliacao(session, prato_id, entrada.nota, entrada.comentario, hoje)
-    except PratoNaoEncontrado:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Prato não encontrado.") from None
-    except ValueError as erro:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(erro)) from None
-    except ForaDoPrazo as erro:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(erro)) from None
+    except PratoNaoEncontrado as erro:
+        raise HTTPException(status_do_erro_de_avaliacao(erro), "Prato não encontrado.") from None
+    except (ValueError, ForaDoPrazo) as erro:
+        raise HTTPException(status_do_erro_de_avaliacao(erro), str(erro)) from None
 
     return AvaliacaoPublica.model_validate(criada, from_attributes=True)

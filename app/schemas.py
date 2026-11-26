@@ -36,6 +36,10 @@ class CardapioDoDia(BaseModel):
     data: date
     refeicoes: list[RefeicaoPublica]
 
+    @classmethod
+    def de_db(cls, data: date, refeicoes: list[RefeicaoDB]) -> "CardapioDoDia":
+        return cls(data=data, refeicoes=[RefeicaoPublica.de_db(r) for r in refeicoes])
+
 
 class CardapioDaSemana(BaseModel):
     dias: list[CardapioDoDia]

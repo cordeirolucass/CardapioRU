@@ -7,19 +7,17 @@ from sqlmodel import Session
 
 from app.dependencies import HojeDep, SessionDep
 from app.domain.avaliacao import NOTA_MAXIMA, NOTA_MINIMA, TAMANHO_MAXIMO_COMENTARIO
-from app.domain.cardapio import cardapio_da_semana
-from app.domain.estatisticas import media_avaliacoes, ranking_pratos
+from app.domain.estatisticas import media_avaliacoes
 from app.domain.filtros import filtrar_pratos
 from app.domain.prato import Categoria
 from app.models import PratoDB
 from app.repositories import avaliacoes as repo_avaliacoes
 from app.repositories import pratos as repo_pratos
 from app.repositories import refeicoes as repo_refeicoes
-from app.services.avaliacoes import (
-    ForaDoPrazo,
-    esta_no_prazo,
-    registrar_avaliacao,
-)
+from app.routers.erros import status_do_erro_de_avaliacao
+from app.services.avaliacoes import ForaDoPrazo, esta_no_prazo, registrar_avaliacao
+from app.services.cardapio import semana_de
+from app.services.ranking import ranking_atual
 from app.web import templates
 
 router = APIRouter(include_in_schema=False)
@@ -43,7 +41,7 @@ def pagina_semana(
     categoria_filtro = categoria if categoria in set(Categoria) else None
     filtrando = categoria_filtro is not None or vegetariano
 
-    semana = cardapio_da_semana(repo_refeicoes.listar_da_semana(session, hoje), hoje)
+    semana = semana_de(session, hoje)
     # Cada dia vira (tem_cardapio, [(refeicao, pratos_filtrados)]). Os pratos são filtrados
     # numa lista à parte para não mexer no relacionamento refeicao.pratos do banco.
     dias = {}
@@ -70,8 +68,8 @@ def pagina_semana(
 
 @router.get("/ranking", response_class=HTMLResponse)
 def pagina_ranking(request: Request, session: SessionDep):
-    itens = ranking_pratos((prato, prato.avaliacoes) for prato in repo_pratos.listar(session))
-    return templates.TemplateResponse(request, "ranking.html", {"itens": itens})
+    contexto = {"itens": ranking_atual(session)}
+    return templates.TemplateResponse(request, "ranking.html", contexto)
 
 
 def _pagina_nao_encontrada(request: Request):
@@ -136,11 +134,6 @@ def enviar_avaliacao(
             raise ValueError(f"Escolha uma nota de {NOTA_MINIMA} a {NOTA_MAXIMA}.")
         registrar_avaliacao(session, prato_id, int(nota), comentario, hoje)
     except (ValueError, ForaDoPrazo) as erro:
-        codigo = (
-            status.HTTP_400_BAD_REQUEST
-            if isinstance(erro, ForaDoPrazo)
-            else status.HTTP_422_UNPROCESSABLE_CONTENT
-        )
         return _pagina_prato(
             request,
             session,
@@ -149,7 +142,7 @@ def enviar_avaliacao(
             erro=str(erro),
             nota=nota,
             comentario=comentario,
-            status_code=codigo,
+            status_code=status_do_erro_de_avaliacao(erro),
         )
 
     return RedirectResponse(
