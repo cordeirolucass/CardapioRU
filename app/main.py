@@ -6,7 +6,7 @@ from sqlmodel import Session
 
 from app.database import criar_tabelas, engine
 from app.dependencies import hoje
-from app.routers import cardapio, pratos, ranking
+from app.routers import cardapio, paginas, pratos, ranking
 from app.seed import popular_banco
 
 
@@ -22,6 +22,7 @@ app = FastAPI(title="CardápioRU", lifespan=lifespan)
 app.include_router(pratos.router)
 app.include_router(cardapio.router)
 app.include_router(ranking.router)
+app.include_router(paginas.router)
 
 
 @app.get("/health")

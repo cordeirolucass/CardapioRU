@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block titulo %}Cardápio de hoje{% endblock %}
+
+{% block conteudo %}
+<hgroup>
+  <h1>Cardápio de hoje</h1>
+  <p>{{ hoje | dia_da_semana }}, {{ hoje | data_br }}</p>
+</hgroup>
+
+{% if refeicoes %}
+  <div class="grid">
+    {% for refeicao in refeicoes %}
+      <article data-testid="refeicao-{{ refeicao.tipo.value }}">
+        <header><h2>{{ refeicao.tipo | tipo_refeicao }}</h2></header>
+        <ul>
+          {% for prato in refeicao.pratos %}
+            <li data-testid="prato">
+              <a href="/pratos/{{ prato.id }}">{{ prato.nome }}</a>
+              <small>· {{ prato.categoria | categoria }}{% if prato.e_vegetariano %} · 🌱 vegetariano{% endif %}</small>
+            </li>
+          {% endfor %}
+        </ul>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <article data-testid="sem-cardapio">
+    <p>Não há cardápio para hoje. O RU funciona de segunda a sexta, então
+      dá uma olhada no <a href="/semana">cardápio da semana</a>.</p>
+  </article>
+{% endif %}
+{% endblock %}
