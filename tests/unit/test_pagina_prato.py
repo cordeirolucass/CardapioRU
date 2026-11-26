@@ -62,6 +62,8 @@ def test_formulario_aparece_dentro_do_prazo(client, definir_hoje, feijoada):
 
     assert 'data-testid="form-avaliacao"' in html
     assert f'action="/pratos/{feijoada.id}/avaliacoes"' in html
+    for testid in ["nota-1", "nota-5", "comentario", "enviar-avaliacao"]:
+        assert f'data-testid="{testid}"' in html
     assert 'data-testid="prazo-encerrado"' not in html
 
 

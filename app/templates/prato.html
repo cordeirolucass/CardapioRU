@@ -41,7 +41,7 @@
         <legend>Nota</legend>
         {% for n in notas %}
           <label>
-            <input type="radio" name="nota" value="{{ n }}" required
+            <input type="radio" name="nota" value="{{ n }}" required data-testid="nota-{{ n }}"
                    {% if nota == n | string %}checked{% endif %}>
             {{ n }} {{ "★" * n }}
           </label>
@@ -50,12 +50,12 @@
 
       <label>
         Comentário (opcional)
-        <textarea name="comentario" maxlength="{{ tamanho_maximo_comentario }}" rows="3"
+        <textarea name="comentario" data-testid="comentario" maxlength="{{ tamanho_maximo_comentario }}" rows="3"
                   placeholder="O que achou?">{{ comentario or "" }}</textarea>
         <small>Até {{ tamanho_maximo_comentario }} caracteres.</small>
       </label>
 
-      <button type="submit">Enviar avaliação</button>
+      <button type="submit" data-testid="enviar-avaliacao">Enviar avaliação</button>
     </form>
   {% else %}
     <p data-testid="prazo-encerrado">
