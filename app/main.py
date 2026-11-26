@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from sqlmodel import Session
 
 from app.database import criar_tabelas, engine
+from app.routers import pratos
 from app.seed import popular_banco
 
 
@@ -18,6 +19,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="CardápioRU", lifespan=lifespan)
+app.include_router(pratos.router)
 
 
 @app.get("/health")
