@@ -1,6 +1,8 @@
+from datetime import date
+
 from pydantic import BaseModel
 
-from app.models import PratoDB
+from app.models import PratoDB, RefeicaoDB, TipoRefeicao
 
 
 class PratoPublico(BaseModel):
@@ -19,3 +21,21 @@ class PratoPublico(BaseModel):
             calorias=prato.calorias,
             vegetariano=prato.e_vegetariano,
         )
+
+
+class RefeicaoPublica(BaseModel):
+    tipo: TipoRefeicao
+    pratos: list[PratoPublico]
+
+    @classmethod
+    def de_db(cls, refeicao: RefeicaoDB) -> "RefeicaoPublica":
+        return cls(tipo=refeicao.tipo, pratos=[PratoPublico.de_db(p) for p in refeicao.pratos])
+
+
+class CardapioDoDia(BaseModel):
+    data: date
+    refeicoes: list[RefeicaoPublica]
+
+
+class CardapioDaSemana(BaseModel):
+    dias: list[CardapioDoDia]
