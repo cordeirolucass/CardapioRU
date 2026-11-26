@@ -36,3 +36,9 @@ jobs:
 
       - name: Roda os testes de unidade com cobertura
         run: pytest tests/unit -v --cov=app --cov-report=term-missing --cov-fail-under=80
+
+      - name: Instala o Chromium do Playwright
+        run: python -m playwright install --with-deps chromium
+
+      - name: Roda os testes e2e
+        run: pytest tests/e2e -v
