@@ -5,6 +5,7 @@ from sqlmodel import Session, SQLModel, create_engine
 
 import app.models  # noqa: F401  (registra as tabelas no metadata)
 from app.database import get_session
+from app.dependencies import hoje
 from app.main import app
 
 
@@ -26,3 +27,13 @@ def client(session):
     app.dependency_overrides[get_session] = lambda: session
     yield TestClient(app)
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def definir_hoje(client):
+    """Fixa a data de "hoje" vista pela API."""
+
+    def definir(data):
+        app.dependency_overrides[hoje] = lambda: data
+
+    return definir
