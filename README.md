@@ -52,6 +52,13 @@ O código é organizado em camadas:
 
 ## Uso de IA
 
+Usamos o **Claude Code** como assistente ao longo do desenvolvimento:
+
+- **Geração de código, testes e CI, com revisão humana:** a IA gerou parte do código das páginas, dos testes de unidade e e2e e dos passos do GitHub Actions. Todo o conteúdo gerado foi revisado pelo grupo antes de entrar no repositório.
+- **Sugestão de testes para aumentar a cobertura:** a partir do relatório de cobertura, a IA apontou as linhas que nenhum teste executava e sugeriu testes para elas.
+- **Entender melhor enunciados:** usamos a IA para esclarecer o que cada parte do enunciado pedia antes de começar a implementar.
+- **Estimular ideias:** usamos a IA para levantar ideias e alternativas, que depois discutimos e escolhemos em grupo.
+
 ## Como executar localmente
 
 Pré-requisitos: Python 3.12 ou superior e Git.
