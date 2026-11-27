@@ -58,6 +58,7 @@ Usamos o **Claude Code** como assistente ao longo do desenvolvimento:
 - **Sugestão de testes para aumentar a cobertura:** a partir do relatório de cobertura, a IA apontou as linhas que nenhum teste executava e sugeriu testes para elas.
 - **Entender melhor enunciados:** usamos a IA para esclarecer o que cada parte do enunciado pedia antes de começar a implementar.
 - **Estimular ideias:** usamos a IA para levantar ideias e alternativas, que depois discutimos e escolhemos em grupo.
+- **Vídeo de apresentação:** o vídeo foi montado com o Claude Code, a partir de gravações reais do sistema e dos testes, e a narração usa voz sintética gerada pelo [Piper](https://github.com/rhasspy/piper).
 
 ## Como executar localmente
 
